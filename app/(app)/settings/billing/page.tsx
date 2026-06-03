@@ -68,6 +68,8 @@ export default function BillingPage() {
     setPortalLoading(false);
   };
 
+  const [switchSuccess, setSwitchSuccess] = useState<string | null>(null);
+
   const handleUpgrade = async (planKey: string) => {
     const priceId =
       planKey === "starter" ? process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID
@@ -77,14 +79,27 @@ export default function BillingPage() {
     if (!priceId) { alert("Price not configured. Check .env.local"); return; }
 
     setUpgradeLoading(planKey);
-    const res = await fetch("/api/billing/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ priceId }),
-    });
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
-    setUpgradeLoading(null);
+    try {
+      const res = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId }),
+      });
+      const data = await res.json();
+
+      if (data.switched) {
+        // Plan was swapped in-place — no redirect, just refresh
+        setSwitchSuccess(`Switched to ${planKey.charAt(0).toUpperCase() + planKey.slice(1)} plan!`);
+        setProfile((prev) => prev ? { ...prev, subscription_tier: data.tier } : prev);
+        setTimeout(() => setSwitchSuccess(null), 4000);
+      } else if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setUpgradeLoading(null);
+    }
   };
 
   const tier = profile?.subscription_tier ?? "free";
@@ -101,6 +116,17 @@ export default function BillingPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-7 animate-fade-in">
+      {/* Plan switch success toast */}
+      {switchSuccess && (
+        <div className="flex items-center gap-3 px-5 py-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 animate-slide-up">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold">{switchSuccess}</p>
+            <p className="text-xs text-emerald-600">Your plan has been updated. Stripe has prorated any difference.</p>
+          </div>
+        </div>
+      )}
+
       {/* Current plan */}
       <div className="card p-6">
         <div className="flex items-start justify-between mb-5">
