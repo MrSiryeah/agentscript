@@ -29,7 +29,7 @@ export async function generateContent(
   maxTokens: number = 800
 ): Promise<GenerationResult> {
   const response = await anthropic.messages.create({
-    model: "claude-3-5-sonnet-20241022",
+    model: "claude-sonnet-4-5-20250929",
     max_tokens: maxTokens,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: userPrompt }],
