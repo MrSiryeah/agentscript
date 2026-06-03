@@ -28,19 +28,46 @@ export async function POST(req: Request) {
     const customerId = session.customer as string;
     const subscriptionId = session.subscription as string;
 
-    if (clerkUserId && subscriptionId) {
+    if (subscriptionId) {
       const subscription = await stripe.subscriptions.retrieve(subscriptionId);
       const priceId = subscription.items.data[0].price.id;
       const tier = PRICE_TO_TIER[priceId] ?? "starter";
 
-      await supabase
-        .from("profiles")
-        .update({
-          stripe_customer_id: customerId,
-          stripe_subscription_id: subscriptionId,
-          subscription_tier: tier,
-        })
-        .eq("clerk_user_id", clerkUserId);
+      if (clerkUserId) {
+        // Primary: update by Clerk user ID (normal flow)
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            stripe_customer_id: customerId,
+            stripe_subscription_id: subscriptionId,
+            subscription_tier: tier,
+          })
+          .eq("clerk_user_id", clerkUserId);
+
+        // Fallback: if profile didn't exist yet, upsert it using email from Stripe
+        if (error) {
+          const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer;
+          if (customer.email) {
+            await supabase.from("profiles").upsert({
+              clerk_user_id: clerkUserId,
+              email: customer.email,
+              full_name: customer.name ?? null,
+              stripe_customer_id: customerId,
+              stripe_subscription_id: subscriptionId,
+              subscription_tier: tier,
+            }, { onConflict: "clerk_user_id" });
+          }
+        }
+      } else {
+        // No Clerk ID in metadata — match by stripe_customer_id
+        await supabase
+          .from("profiles")
+          .update({
+            stripe_subscription_id: subscriptionId,
+            subscription_tier: tier,
+          })
+          .eq("stripe_customer_id", customerId);
+      }
     }
   }
 
@@ -51,7 +78,7 @@ export async function POST(req: Request) {
 
     await supabase
       .from("profiles")
-      .update({ subscription_tier: tier })
+      .update({ subscription_tier: tier, stripe_subscription_id: subscription.id })
       .eq("stripe_customer_id", subscription.customer as string);
   }
 
