@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 224 37% 6%;
+    --foreground: 210 40% 96%;
+    --card: 222 26% 9%;
+    --card-foreground: 210 40% 96%;
+    --popover: 222 26% 9%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 38 93% 54%;
+    --primary-foreground: 224 37% 6%;
+    --secondary: 222 26% 14%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 222 26% 14%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 222 26% 14%;
+    --accent-foreground: 210 40% 96%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 96%;
+    --border: 222 26% 16%;
+    --input: 222 26% 14%;
+    --ring: 38 93% 54%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  ::selection {
+    background: hsl(38 93% 54% / 0.3);
+    color: hsl(210 40% 96%);
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(222 26% 9%);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(222 26% 22%);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(38 93% 54% / 0.6);
+  }
+}
+
+@layer components {
+  /* Glass card effect */
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-md border border-border/50 rounded-xl;
+  }
+
+  /* Gold gradient text */
+  .gold-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(38, 93%, 54%), hsl(45, 96%, 70%));
+  }
+
+  /* Glowing gold button */
+  .btn-gold {
+    @apply relative overflow-hidden rounded-lg px-6 py-3 font-semibold text-slate-950 transition-all duration-200;
+    background: linear-gradient(135deg, hsl(38, 93%, 54%), hsl(35, 91%, 48%));
+    box-shadow: 0 0 0 0 hsl(38, 93%, 54%, 0);
+  }
+
+  .btn-gold:hover {
+    box-shadow: 0 0 24px hsl(38, 93%, 54%, 0.4), 0 4px 16px hsl(38, 93%, 54%, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .btn-gold:active {
+    transform: translateY(0);
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-all duration-150 hover:text-foreground hover:bg-secondary;
+  }
+
+  /* Input field */
+  .field-input {
+    @apply w-full rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground 
+    focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-150;
+  }
+
+  /* Sidebar nav item */
+  .nav-item {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground
+    transition-all duration-150 hover:text-foreground hover:bg-secondary/80 cursor-pointer;
+  }
+
+  .nav-item.active {
+    @apply text-foreground bg-secondary/80;
+    box-shadow: inset 3px 0 0 hsl(38, 93%, 54%);
+  }
+
+  /* Gradient border card */
+  .gradient-border {
+    position: relative;
+    border-radius: 0.75rem;
+    background: hsl(222 26% 9%);
+  }
+
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 0.75rem;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(38, 93%, 54%, 0.3), hsl(222, 26%, 22%, 0.5));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Animated shimmer loading */
+  .shimmer {
+    @apply animate-shimmer;
+    background: linear-gradient(90deg,
+      hsl(222, 26%, 12%) 25%,
+      hsl(222, 26%, 18%) 50%,
+      hsl(222, 26%, 12%) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer-sweep 1.5s infinite;
+  }
+
+  @keyframes shimmer-sweep {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Feature icon circle */
+  .icon-circle {
+    @apply flex items-center justify-center rounded-xl w-12 h-12;
+    background: linear-gradient(135deg, hsl(38, 93%, 54%, 0.15), hsl(38, 93%, 54%, 0.05));
+    border: 1px solid hsl(38, 93%, 54%, 0.2);
+  }
+}
+
+/* Clerk component overrides */
+.cl-rootBox {
+  width: 100%;
+}
+
+.cl-card {
+  background: hsl(222 26% 9%) !important;
+  border: 1px solid hsl(222 26% 16%) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 25px 50px -12px hsl(224 37% 3% / 0.8) !important;
+}
+
+.cl-headerTitle {
+  color: hsl(210 40% 96%) !important;
+}
+
+.cl-formButtonPrimary {
+  background: linear-gradient(135deg, hsl(38, 93%, 54%), hsl(35, 91%, 48%)) !important;
+  color: hsl(224 37% 6%) !important;
+  font-weight: 600 !important;
+}
+
+.cl-formButtonPrimary:hover {
+  box-shadow: 0 0 20px hsl(38, 93%, 54%, 0.4) !important;
+}
