@@ -4,9 +4,10 @@ import { useState } from "react";
 import { OutputCard } from "@/components/shared/output-card";
 import { UpgradePrompt } from "@/components/shared/upgrade-prompt";
 import { Loader2, Mail } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const HOW_WE_MET = ["Open House", "Website Inquiry", "Referral", "Cold Call", "Social Media", "Portal", "Networking Event"];
-const SITUATIONS = ["Actively Looking", "Just Browsing", "Looking to Sell", "Investor", "Relocating", "Undecided"];
+const HOW_WE_MET = ["Open House", "Website Inquiry", "Referral", "Cold Call", "Social Media", "Portal / Zillow", "Networking Event", "Friend / Family"];
+const SITUATIONS = ["Actively Looking", "Just Browsing", "Looking to Sell First", "Investor", "Relocating", "Undecided", "Already Made an Offer"];
 const FOLLOW_UP_TYPES = [
   "First Follow-Up",
   "Check-In (2 Weeks Later)",
@@ -14,6 +15,8 @@ const FOLLOW_UP_TYPES = [
   "Post-Viewing Follow-Up",
   "After Offer Submitted",
   "Monthly Check-In",
+  "Price Drop Notification",
+  "New Listing Match",
 ];
 const TONES = ["Professional", "Warm & Friendly", "Concise", "Enthusiastic"];
 
@@ -45,7 +48,6 @@ export function EmailForm() {
         body: JSON.stringify(form),
       });
       const data = await res.json();
-
       if (res.status === 429 && data.upgrade) { setShowUpgrade(true); return; }
       if (!res.ok) throw new Error(data.error || "Generation failed");
       setResult(data);
@@ -59,88 +61,66 @@ export function EmailForm() {
   const handleRegenerate = () => handleSubmit({ preventDefault: () => {} } as React.FormEvent);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-5">
       {showUpgrade && <UpgradePrompt onClose={() => setShowUpgrade(false)} />}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="glass-card p-6 space-y-5">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="icon-circle"><Mail className="w-5 h-5 text-primary" /></div>
-            <h2 className="text-base font-semibold text-foreground">Lead Details</h2>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="card p-6 space-y-5">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="icon-wrap"><Mail className="w-5 h-5 text-teal-600" /></div>
+            <div>
+              <h2 className="text-sm font-semibold text-slate-800">Lead Details</h2>
+              <p className="text-xs text-slate-400">Tell us about who you're following up with</p>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Lead Name *</label>
-              <input
-                type="text" required
-                placeholder="e.g. Sarah Johnson"
-                value={form.leadName}
-                onChange={(e) => setForm({ ...form, leadName: e.target.value })}
-                className="field-input"
-              />
+              <label className="field-label">Lead Name *</label>
+              <input type="text" required placeholder="e.g. Sarah Johnson"
+                value={form.leadName} onChange={(e) => setForm({ ...form, leadName: e.target.value })}
+                className="field-input" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">How We Met</label>
-              <select
-                value={form.howWeMet}
-                onChange={(e) => setForm({ ...form, howWeMet: e.target.value })}
-                className="field-input"
-              >
+              <label className="field-label">How We Met</label>
+              <select value={form.howWeMet} onChange={(e) => setForm({ ...form, howWeMet: e.target.value })} className="field-input">
                 {HOW_WE_MET.map((h) => <option key={h}>{h}</option>)}
               </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
-              Property They Were Interested In <span className="text-muted-foreground">(optional)</span>
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. 3-bed house in Coral Gables"
-              value={form.propertyInterest}
-              onChange={(e) => setForm({ ...form, propertyInterest: e.target.value })}
-              className="field-input"
-            />
+            <label className="field-label">Property They Were Interested In <span className="text-slate-400 font-normal">(optional)</span></label>
+            <input type="text" placeholder="e.g. 550 Okeechobee Blvd #Uph-04, West Palm Beach"
+              value={form.propertyInterest} onChange={(e) => setForm({ ...form, propertyInterest: e.target.value })}
+              className="field-input" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Their Situation</label>
-              <select
-                value={form.leadSituation}
-                onChange={(e) => setForm({ ...form, leadSituation: e.target.value })}
-                className="field-input"
-              >
+              <label className="field-label">Their Situation</label>
+              <select value={form.leadSituation} onChange={(e) => setForm({ ...form, leadSituation: e.target.value })} className="field-input">
                 {SITUATIONS.map((s) => <option key={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Follow-Up Type</label>
-              <select
-                value={form.followUpType}
-                onChange={(e) => setForm({ ...form, followUpType: e.target.value })}
-                className="field-input"
-              >
+              <label className="field-label">Follow-Up Type</label>
+              <select value={form.followUpType} onChange={(e) => setForm({ ...form, followUpType: e.target.value })} className="field-input">
                 {FOLLOW_UP_TYPES.map((f) => <option key={f}>{f}</option>)}
               </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">Email Tone</label>
+            <label className="field-label">Email Tone</label>
             <div className="flex flex-wrap gap-2">
               {TONES.map((tone) => (
-                <button
-                  key={tone} type="button"
-                  onClick={() => setForm({ ...form, tone })}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 border ${
+                <button key={tone} type="button" onClick={() => setForm({ ...form, tone })}
+                  className={cn("px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 border",
                     form.tone === tone
-                      ? "bg-primary/15 border-primary/40 text-primary"
-                      : "bg-secondary/30 border-border/50 text-muted-foreground hover:text-foreground hover:border-border"
-                  }`}
-                >
+                      ? "bg-teal-50 border-teal-300 text-teal-700"
+                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                  )}>
                   {tone}
                 </button>
               ))}
@@ -149,28 +129,23 @@ export function EmailForm() {
         </div>
 
         {error && (
-          <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-lg border border-destructive/20">
-            {error}
-          </p>
+          <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
         )}
 
-        <button type="submit" disabled={loading} className="btn-gold w-full flex items-center justify-center gap-2 py-3.5">
-          {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating…</> : <>Generate Follow-Up Email ✦</>}
+        <button type="submit" disabled={loading} className="btn-primary w-full py-3.5 text-base">
+          {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating…</> : <>Generate Follow-Up Email</>}
         </button>
       </form>
 
       {result && (
-        <div className="space-y-4">
-          <div className="glass-card p-4 flex items-start gap-3">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-0.5">Subject</span>
-            <p className="text-sm font-semibold text-foreground">{result.subject}</p>
+        <div className="space-y-4 animate-slide-up">
+          <div className="card px-5 py-4 flex items-center gap-3 border-l-4 border-l-teal-500">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest shrink-0">Subject</span>
+            <p className="text-sm font-semibold text-slate-800">{result.subject}</p>
           </div>
-          <OutputCard
-            label="Email Body"
-            content={result.emailBody}
-            onRegenerate={handleRegenerate}
-            isRegenerating={loading}
-          />
+          <OutputCard label="Email Body" content={result.emailBody} onRegenerate={handleRegenerate} isRegenerating={loading} />
         </div>
       )}
     </div>
