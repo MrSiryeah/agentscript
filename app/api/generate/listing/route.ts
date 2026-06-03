@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { generateContent } from "@/lib/anthropic";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { ensureProfile } from "@/lib/supabase/ensure-profile";
 import { MONTHLY_LIMITS } from "@/types";
 
 export async function POST(req: Request) {
@@ -17,13 +18,8 @@ export async function POST(req: Request) {
     } = body;
 
     const supabase = createServerSupabaseClient();
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id, subscription_tier, generation_count_this_month, generation_reset_date, market_location")
-      .eq("clerk_user_id", userId)
-      .single();
+    const profile = await ensureProfile(userId);
 
-    if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
 
 
     // Reset monthly count if new period started

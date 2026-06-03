@@ -57,10 +57,7 @@ export function ListingForm() {
       });
       const data = await res.json();
 
-      if (res.status === 429 && data.upgrade) {
-        setShowUpgrade(true);
-        return;
-      }
+      if (res.status === 429 && data.upgrade) { setShowUpgrade(true); return; }
       if (!res.ok) throw new Error(data.error || "Generation failed");
       setResult(data);
     } catch (err) {
@@ -70,28 +67,27 @@ export function ListingForm() {
     }
   };
 
-  const handleRegenerate = async () => {
-    const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
-    await handleSubmit(fakeEvent);
-  };
+  const handleRegenerate = () => handleSubmit({ preventDefault: () => {} } as React.FormEvent);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-5">
       {showUpgrade && <UpgradePrompt onClose={() => setShowUpgrade(false)} />}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Basic Info */}
-        <div className="glass-card p-6 space-y-5">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="icon-circle"><Home className="w-5 h-5 text-primary" /></div>
-            <h2 className="text-base font-semibold text-foreground">Property Details</h2>
+        <div className="card p-6 space-y-5">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="icon-wrap"><Home className="w-5 h-5 text-teal-600" /></div>
+            <div>
+              <h2 className="text-sm font-semibold text-slate-800">Property Details</h2>
+              <p className="text-xs text-slate-400">Fill in the basics to get started</p>
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">Property Address *</label>
+            <label className="field-label">Property Address *</label>
             <input
-              type="text"
-              required
+              type="text" required
               placeholder="e.g. 42 Ocean Drive, Miami, FL"
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
@@ -101,22 +97,14 @@ export function ListingForm() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Property Type</label>
-              <select
-                value={form.propertyType}
-                onChange={(e) => setForm({ ...form, propertyType: e.target.value })}
-                className="field-input"
-              >
+              <label className="field-label">Property Type</label>
+              <select value={form.propertyType} onChange={(e) => setForm({ ...form, propertyType: e.target.value })} className="field-input">
                 {PROPERTY_TYPES.map((t) => <option key={t}>{t}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Tone</label>
-              <select
-                value={form.tone}
-                onChange={(e) => setForm({ ...form, tone: e.target.value })}
-                className="field-input"
-              >
+              <label className="field-label">Tone</label>
+              <select value={form.tone} onChange={(e) => setForm({ ...form, tone: e.target.value })} className="field-input">
                 {TONES.map((t) => <option key={t}>{t}</option>)}
               </select>
             </div>
@@ -124,40 +112,18 @@ export function ListingForm() {
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Bedrooms *</label>
-              <input
-                type="number" min="0" max="20" required
-                placeholder="3"
-                value={form.bedrooms}
-                onChange={(e) => setForm({ ...form, bedrooms: e.target.value })}
-                className="field-input"
-              />
+              <label className="field-label">Bedrooms *</label>
+              <input type="number" min="0" max="20" required placeholder="3" value={form.bedrooms} onChange={(e) => setForm({ ...form, bedrooms: e.target.value })} className="field-input" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Bathrooms *</label>
-              <input
-                type="number" min="0" max="20" step="0.5" required
-                placeholder="2"
-                value={form.bathrooms}
-                onChange={(e) => setForm({ ...form, bathrooms: e.target.value })}
-                className="field-input"
-              />
+              <label className="field-label">Bathrooms *</label>
+              <input type="number" min="0" max="20" step="0.5" required placeholder="2" value={form.bathrooms} onChange={(e) => setForm({ ...form, bathrooms: e.target.value })} className="field-input" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Size</label>
+              <label className="field-label">Size</label>
               <div className="flex gap-2">
-                <input
-                  type="number" min="0"
-                  placeholder="2,400"
-                  value={form.squareFootage}
-                  onChange={(e) => setForm({ ...form, squareFootage: e.target.value })}
-                  className="field-input"
-                />
-                <select
-                  value={form.sizeUnit}
-                  onChange={(e) => setForm({ ...form, sizeUnit: e.target.value as "sq ft" | "sq m" })}
-                  className="field-input w-24"
-                >
+                <input type="number" min="0" placeholder="2,400" value={form.squareFootage} onChange={(e) => setForm({ ...form, squareFootage: e.target.value })} className="field-input" />
+                <select value={form.sizeUnit} onChange={(e) => setForm({ ...form, sizeUnit: e.target.value as "sq ft" | "sq m" })} className="field-input w-24 shrink-0">
                   <option value="sq ft">sq ft</option>
                   <option value="sq m">sq m</option>
                 </select>
@@ -166,30 +132,25 @@ export function ListingForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">Target Audience</label>
-            <select
-              value={form.targetAudience}
-              onChange={(e) => setForm({ ...form, targetAudience: e.target.value })}
-              className="field-input"
-            >
+            <label className="field-label">Target Audience</label>
+            <select value={form.targetAudience} onChange={(e) => setForm({ ...form, targetAudience: e.target.value })} className="field-input">
               {AUDIENCES.map((a) => <option key={a}>{a}</option>)}
             </select>
           </div>
         </div>
 
         {/* Features */}
-        <div className="glass-card p-6">
-          <label className="block text-sm font-medium text-foreground mb-3">Key Features</label>
+        <div className="card p-6">
+          <label className="field-label mb-3">Key Features</label>
           <div className="flex flex-wrap gap-2">
             {FEATURES.map((feature) => (
               <button
-                key={feature}
-                type="button"
+                key={feature} type="button"
                 onClick={() => toggleFeature(feature)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 border ${
                   form.features.includes(feature)
-                    ? "bg-primary/15 border-primary/40 text-primary"
-                    : "bg-secondary/30 border-border/50 text-muted-foreground hover:text-foreground hover:border-border"
+                    ? "bg-teal-50 border-teal-300 text-teal-700"
+                    : "bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-800"
                 }`}
               >
                 {feature}
@@ -199,58 +160,39 @@ export function ListingForm() {
         </div>
 
         {/* Additional Details */}
-        <div className="glass-card p-6">
-          <label className="block text-sm font-medium text-foreground mb-1.5">
-            Additional Details <span className="text-muted-foreground">(optional)</span>
-          </label>
+        <div className="card p-6">
+          <label className="field-label">Additional Details <span className="text-slate-400 font-normal">(optional)</span></label>
           <textarea
-            rows={3}
-            maxLength={300}
+            rows={3} maxLength={300}
             placeholder="Anything unique about this property that sets it apart…"
             value={form.additionalDetails}
             onChange={(e) => setForm({ ...form, additionalDetails: e.target.value })}
             className="field-input resize-none"
           />
-          <p className="text-xs text-muted-foreground mt-1 text-right">
-            {form.additionalDetails.length}/300
-          </p>
+          <p className="text-xs text-slate-400 mt-1 text-right">{form.additionalDetails.length}/300</p>
         </div>
 
         {error && (
-          <p className="text-sm text-destructive bg-destructive/10 px-4 py-3 rounded-lg border border-destructive/20">
-            {error}
-          </p>
+          <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn-gold w-full flex items-center justify-center gap-2 py-3.5"
-        >
+        <button type="submit" disabled={loading} className="btn-primary w-full py-3.5 text-base">
           {loading ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Generating…</>
           ) : (
-            <>Generate Listing Description ✦</>
+            <>Generate Listing Description</>
           )}
         </button>
       </form>
 
       {/* Results */}
       {result && (
-        <div className="space-y-4">
-          <OutputCard
-            label="Full Listing Description"
-            content={result.listingDescription}
-            onRegenerate={handleRegenerate}
-            isRegenerating={loading}
-          />
+        <div className="space-y-4 animate-slide-up">
+          <OutputCard label="Full Listing Description" content={result.listingDescription} onRegenerate={handleRegenerate} isRegenerating={loading} />
           {result.shortTeaser && (
-            <OutputCard
-              label="Short Teaser"
-              content={result.shortTeaser}
-              onRegenerate={handleRegenerate}
-              isRegenerating={loading}
-            />
+            <OutputCard label="Short Teaser" content={result.shortTeaser} onRegenerate={handleRegenerate} isRegenerating={loading} />
           )}
         </div>
       )}

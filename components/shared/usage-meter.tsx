@@ -18,10 +18,13 @@ export function UsageMeter({ used, limit, tier, className }: UsageMeterProps) {
   return (
     <div className={cn("space-y-2", className)}>
       <div className="flex items-center justify-between text-sm">
-        <span className="text-muted-foreground font-medium">Generations</span>
-        <span className={cn("font-semibold", isCritical ? "text-destructive" : isWarning ? "text-amber-400" : "text-foreground")}>
+        <span className="font-medium text-slate-600">Generations used</span>
+        <span className={cn(
+          "font-bold",
+          isCritical ? "text-red-600" : isWarning ? "text-amber-600" : "text-slate-800"
+        )}>
           {isUnlimited ? (
-            <span className="text-primary">Unlimited</span>
+            <span className="text-teal-600">Unlimited</span>
           ) : (
             `${used} / ${limit}`
           )}
@@ -29,24 +32,20 @@ export function UsageMeter({ used, limit, tier, className }: UsageMeterProps) {
       </div>
 
       {!isUnlimited && (
-        <div className="relative h-2 w-full rounded-full bg-secondary overflow-hidden">
+        <div className="relative h-2 w-full rounded-full bg-slate-100 overflow-hidden">
           <div
             className={cn(
               "h-full rounded-full transition-all duration-500",
-              isCritical
-                ? "bg-destructive"
-                : isWarning
-                ? "bg-amber-400"
-                : "bg-gold-gradient"
+              isCritical ? "bg-red-500" : isWarning ? "bg-amber-400" : "bg-teal-500"
             )}
             style={{ width: `${percentage}%` }}
           />
         </div>
       )}
 
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs text-slate-400">
         {isUnlimited
-          ? `${tier} plan — no limits`
+          ? `${tier.charAt(0).toUpperCase() + tier.slice(1)} plan — no limits applied`
           : `${Math.max(0, limit - used)} remaining this month`}
       </p>
     </div>

@@ -28,20 +28,18 @@ export function OutputCard({
   };
 
   return (
-    <div className={cn("gradient-border animate-slide-up", className)}>
+    <div className={cn("output-card animate-slide-up", className)}>
       <div className="p-5">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="icon-circle w-8 h-8">
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-teal-100">
+              <Sparkles className="w-3.5 h-3.5 text-teal-600" />
             </div>
             {label && (
-              <span className="text-sm font-semibold text-foreground">{label}</span>
+              <span className="text-sm font-semibold text-slate-800">{label}</span>
             )}
-            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-              AI Generated
-            </span>
+            <span className="badge-teal">AI Generated</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -49,39 +47,33 @@ export function OutputCard({
               <button
                 onClick={onRegenerate}
                 disabled={isRegenerating}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-md border border-border/50 hover:border-border transition-all duration-150 disabled:opacity-50"
+                className="btn-ghost text-xs"
               >
-                <RefreshCw className={cn("w-3 h-3", isRegenerating && "animate-spin")} />
+                <RefreshCw className={cn("w-3.5 h-3.5", isRegenerating && "animate-spin")} />
                 {isRegenerating ? "Generating..." : "Regenerate"}
               </button>
             )}
             <button
               onClick={handleCopy}
               className={cn(
-                "flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-all duration-150 font-medium",
+                "inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-150",
                 copied
-                  ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                  : "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20"
+                  ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                  : "bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100"
               )}
             >
               {copied ? (
-                <>
-                  <Check className="w-3 h-3" />
-                  Copied!
-                </>
+                <><Check className="w-3.5 h-3.5" /> Copied!</>
               ) : (
-                <>
-                  <Copy className="w-3 h-3" />
-                  Copy
-                </>
+                <><Copy className="w-3.5 h-3.5" /> Copy</>
               )}
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="rounded-lg bg-background/50 border border-border/30 p-4">
-          <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
+        <div className="rounded-xl bg-white border border-slate-100 p-4 shadow-sm">
+          <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
             {content}
           </p>
         </div>
